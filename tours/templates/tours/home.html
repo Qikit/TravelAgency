@@ -141,7 +141,7 @@
                             <img src="https://via.placeholder.com/400x200?text=Нет+фото" class="card-img-top" alt="Нет фото">
                         {% endif %}
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title"><a href="#" class="text-decoration-none text-dark">{{ tour.title }}</a></h5>
+                            <h5 class="card-title"><a href="{% url 'tour_detail' tour.pk %}" class="text-decoration-none text-dark">{{ tour.title }}</a></h5>
                             <p class="card-text text-muted">{{ tour.country.name }}, {{ tour.city.name }}</p>
                             <p class="card-text">{{ tour.description|truncatechars:100 }}</p>
                             <div class="mt-auto">

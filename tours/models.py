@@ -3,6 +3,7 @@ from datetime import date
 from django.db import models
 from django.contrib.auth.models import AbstractUser  # Для расширения стандартной модели пользователя
 from django.contrib import admin
+from datetime import date
 
 
 class User(AbstractUser):
@@ -119,14 +120,15 @@ class Tour(models.Model):
     def __str__(self):
         return f"{self.title} ({self.country.name}, {self.city.name})"
 
-    @property
-    def is_active(self):
-        """Проверяет, активен ли тур (даты актуальны и есть места)."""
-        return self.end_date >= models.DateField.today() and self.available_slots > 0
-
     @admin.display(description='Активен')
     def get_is_active_display(self):
-        return "Да" if self.is_active else "Нет"
+        today = date.today()  # <--- ИЗМЕНИТЕ ЗДЕСЬ С models.DateField.today() НА date.today()
+        return "Да" if self.start_date <= today <= self.end_date and self.available_slots > 0 else "Нет"
+
+    @property
+    def is_active(self):
+        today = date.today()  # <--- ИЗМЕНИТЕ ЗДЕСЬ С models.DateField.today() НА date.today()
+        return self.start_date <= today <= self.end_date and self.available_slots > 0
 
 
 class Booking(models.Model):
