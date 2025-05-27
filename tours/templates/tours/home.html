@@ -17,7 +17,7 @@
             border: none;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             transition: transform 0.2s;
-            height: 100%; /* Устанавливаем фиксированную высоту для карточек */
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
@@ -39,18 +39,38 @@
             margin-bottom: 0.5rem;
         }
         .tour-card .card-text {
-            flex-grow: 1; /* Позволяет тексту занимать доступное пространство */
-            overflow: hidden; /* Скрывает переполнение */
-            text-overflow: ellipsis; /* Добавляет многоточие */
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 3; /* Ограничение на 3 строки */
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
         }
         .promotion-card {
-            min-height: 180px; /* Фиксированная высота для карточек акций */
+            min-height: 180px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+        }
+        .hero-heading {
+            font-family: 'Arial', sans-serif; /* Можно выбрать любой красивый шрифт */
+            font-size: 3.5rem; /* Размер шрифта, можно настроить */
+            font-weight: 900; /* Очень жирный шрифт (Bold) */
+            color: #212529; /* Очень темно-серый, почти черный */
+            text-shadow: none; /* Убираем тени, если они откуда-то взялись */
+            line-height: 1.2; /* Межстрочный интервал */
+        }
+        .hero-subheading {
+            font-family: 'Arial', sans-serif;
+            font-size: 2rem; /* Размер шрифта для подзаголовка */
+            font-weight: 700; /* Жирный шрифт */
+            color: #343a40; /* Чуть светлее черного */
+            text-shadow: none;
+        }
+        .hero-section {
+            text-align: center;
+            padding: 80px 0; /* Отступы сверху и снизу */
+            background-color: #f8f9fa; /* Очень светлый фон для контраста */
         }
     </style>
 </head>
@@ -82,8 +102,8 @@
 
     <header class="hero-section text-center">
         <div class="container">
-            <h1 class="display-4">Откройте для себя мир с нами!</h1>
-            <p class="lead">Найдите тур своей мечты</p>
+            <h1 class="hero-heading">Откройте для себя мир с нами!</h1>
+            <p class="hero-subheading">Найдите тур своей мечты</p>
             <form action="{% url 'search_results' %}" method="get" class="row g-3 justify-content-center mt-4">
                 <div class="col-md-3">
                     <select class="form-select" name="country" aria-label="Страна">
