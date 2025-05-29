@@ -1,0 +1,67 @@
+/* Стили для секции заголовка */
+.hero-section {
+    text-align: center;
+    padding: 80px 0;
+    background-color: #f8f9fa;
+}
+
+.hero-heading {
+    font-family: 'Arial', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #212529;
+    text-shadow: none;
+    line-height: 1.2;
+}
+
+.hero-subheading {
+    font-family: 'Arial', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #343a40;
+    text-shadow: none;
+    margin-bottom: 2rem;
+}
+
+/* Стили для карточек туров */
+.tour-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.tour-card:hover {
+    transform: translateY(-5px);
+}
+
+.tour-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.tour-card .card-body {
+    padding: 1.5rem;
+}
+
+.tour-card .card-title a {
+    font-weight: bold;
+}
+
+.tour-card .card-footer {
+    background-color: white;
+    border-top: 1px solid #eee;
+    padding: 1rem 1.5rem;
+}
+
+/* Стили для акций */
+.promotion-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease-in-out;
+}
+.promotion-card:hover {
+    transform: translateY(-5px);
+}

@@ -1,4 +1,3 @@
-# tour_agency/urls.py
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -6,7 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('tours.urls')), # Включаем URL-ы нашего приложения tours
+    path('', include('tours.urls')),
 ]
 
 if settings.DEBUG:

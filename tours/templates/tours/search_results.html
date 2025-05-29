@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,6 +14,8 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            border-radius: 10px;
+            overflow: hidden;
         }
         .tour-card:hover {
             transform: translateY(-5px);
@@ -26,10 +29,12 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            padding: 1.5rem;
         }
         .tour-card .card-title {
             font-size: 1.25rem;
             margin-bottom: 0.5rem;
+            font-weight: bold;
         }
         .tour-card .card-text {
             flex-grow: 1;
@@ -38,6 +43,11 @@
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
+        }
+        .card-footer {
+            background-color: white;
+            border-top: 1px solid #eee;
+            padding: 1rem 1.5rem;
         }
     </style>
 </head>
@@ -68,33 +78,38 @@
     </nav>
 
     <main class="container my-5">
-        <h1 class="mb-4">Результаты поиска туров {% if search_query %}: "{{ search_query }}"{% endif %}</h1>
+        <h1 class="mb-4 text-center">Результаты поиска туров</h1>
 
-        <form action="{% url 'search_results' %}" method="get" class="row g-3 mb-5">
-            <div class="col-md-3">
-                <input type="text" class="form-control" name="q" placeholder="Поиск по названию, описанию..." value="{{ search_query|default_if_none:'' }}">
-            </div>
+        <form action="{% url 'search_results' %}" method="get" class="row g-3 justify-content-center mb-5">
             <div class="col-md-3">
                 <select class="form-select" name="country" aria-label="Страна">
-                    <option value="">Все страны</option>
+                    <option value="">Выберите страну</option>
                     {% for country in countries %}
-                        <option value="{{ country.id }}" {% if selected_country|slugify == country.id|slugify %}selected{% endif %}>{{ country.name }}</option>
+                        <option value="{{ country.id }}" {% if selected_country == country.id|stringformat:"s" %}selected{% endif %}>{{ country.name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="col-md-3">
                 <select class="form-select" name="city" aria-label="Город">
-                    <option value="">Все города</option>
+                    <option value="">Выберите город</option>
                     {% for city in cities %}
-                        <option value="{{ city.id }}" {% if selected_city|slugify == city.id|slugify %}selected{% endif %}>{{ city.name }}</option>
+                        <option value="{{ city.id }}" {% if selected_city == city.id|stringformat:"s" %}selected{% endif %}>{{ city.name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="date" class="form-control" name="start_date" placeholder="Дата от" value="{{ selected_start_date|default_if_none:'' }}">
+                <input type="date" class="form-control" name="start_date" value="{{ selected_start_date|default_if_none:'' }}">
             </div>
             <div class="col-md-2">
-                <input type="date" class="form-control" name="end_date" placeholder="Дата до" value="{{ selected_end_date|default_if_none:'' }}">
+                <input type="date" class="form-control" name="end_date" value="{{ selected_end_date|default_if_none:'' }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" name="tour_type" aria-label="Тип тура">
+                    <option value="all">Любой тип</option>
+                    {% for type_code, type_name in TOUR_TYPES %}
+                        <option value="{{ type_code }}" {% if selected_tour_type == type_code %}selected{% endif %}>{{ type_name }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-2">
                 <input type="number" class="form-control" name="min_price" placeholder="Мин. цена" value="{{ selected_min_price|default_if_none:'' }}">
@@ -102,17 +117,8 @@
             <div class="col-md-2">
                 <input type="number" class="form-control" name="max_price" placeholder="Макс. цена" value="{{ selected_max_price|default_if_none:'' }}">
             </div>
-             <div class="col-md-2">
-                <select class="form-select" name="tour_type" aria-label="Тип тура">
-                    <option value="all">Любой тип</option>
-                    {% for type_code, type_name in tour_types %}
-                        <option value="{{ type_code }}" {% if selected_tour_type == type_code %}selected{% endif %}>{{ type_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Применить фильтры</button>
-                <a href="{% url 'search_results' %}" class="btn btn-secondary ms-2">Сбросить</a>
+            <div class="col-12 mt-3">
+                <button type="submit" class="btn btn-primary btn-lg">Найти туры</button>
             </div>
         </form>
 
@@ -130,12 +136,16 @@
                             <h5 class="card-title"><a href="{% url 'tour_detail' tour.pk %}" class="text-decoration-none text-dark">{{ tour.title }}</a></h5>
                             <p class="card-text text-muted">{{ tour.country.name }}, {{ tour.city.name }}</p>
                             <p class="card-text">{{ tour.description|truncatechars:100 }}</p>
-                            <div class="mt-auto">
+                            <div class="mt-auto pt-3">
                                 <p class="card-text fw-bold">Цена: {{ tour.price }} руб.</p>
                                 <p class="card-text"><small class="text-muted">Даты: {{ tour.start_date|date:"d.m.Y" }} - {{ tour.end_date|date:"d.m.Y" }}</small></p>
-                                <a href="#" class="btn btn-primary btn-sm">Подробнее</a>
-                                <button class="btn btn-outline-secondary btn-sm float-end">
-                                    <i class="bi bi-heart"></i> Добавить в избранное (не работает)
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'tour_detail' tour.pk %}" class="btn btn-primary btn-sm me-1 flex-grow-1">Подробнее</a>
+                                <button class="btn btn-outline-secondary btn-sm flex-grow-1">
+                                    <i class="bi bi-heart"></i> В избранное
                                 </button>
                             </div>
                         </div>

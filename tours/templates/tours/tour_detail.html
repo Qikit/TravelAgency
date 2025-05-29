@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -54,53 +55,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Личный кабинет</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-sm btn-outline-primary ms-2" href="{% url 'tour_add' %}">Добавить тур</a>
-                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <main class="container my-5">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
         <div class="row tour-header align-items-center">
             <div class="col-md-8">
                 <h1>{{ tour.title }}</h1>
                 <p class="lead">{{ tour.country.name }}, {{ tour.city.name }}</p>
-                <p class="fs-4 fw-bold text-primary">{{ tour.price }} руб.</p>
-                <p class="mb-1">Даты: {{ tour.start_date|date:"d.m.Y" }} - {{ tour.end_date|date:"d.m.Y" }} ({{ tour.duration }} ночей)</p>
-                <p>Тип тура: <span class="badge bg-info">{{ tour.get_tour_type_display }}</span></p>
+                <h2 class="text-primary display-4">{{ tour.price }} руб.</h2>
+                <p class="text-muted">Даты: {{ tour.start_date|date:"d.m.Y" }} - {{ tour.end_date|date:"d.m.Y" }} ({{ tour.duration }} дней)</p>
+                <p class="text-muted">Тип тура: {{ tour.get_tour_type_display }}</p>
                 {% if tour.hotel %}
-                    <p>Отель: <a href="#" class="text-decoration-none">{{ tour.hotel.name }} ({{ tour.hotel.stars }}*)</a></p>
+                    <p class="text-muted">Отель: {{ tour.hotel.name }} ({{ tour.hotel.stars }} звёзд)</p>
                 {% endif %}
-                <p>Доступно мест: <span class="fw-bold">{{ tour.available_slots }}</span></p>
-                {% if tour.is_active %}
-                    <span class="badge bg-success">Активен</span>
-                {% else %}
-                    <span class="badge bg-danger">Неактивен / Нет мест</span>
-                {% endif %}
+                <p class="text-muted">Доступные места: {{ tour.available_slots }}</p>
 
-                <div class="mt-4">
-                    <a href="{% url 'tour_edit' tour.pk %}" class="btn btn-warning me-2">Редактировать</a>
-                    <a href="{% url 'tour_delete' tour.pk %}" class="btn btn-danger">Удалить</a>
-                    <a href="#" class="btn btn-success ms-3">Забронировать</a>
-                    <button class="btn btn-outline-secondary ms-2">
-                        <i class="bi bi-heart"></i> Добавить в избранное (не работает)
-                    </button>
-                </div>
+                <a href="{% url 'tour_edit' tour.pk %}" class="btn btn-warning me-2">Редактировать тур</a>
+                <a href="{% url 'tour_delete' tour.pk %}" class="btn btn-danger">Удалить тур</a>
             </div>
-            <div class="col-md-4 text-center">
+            <div class="col-md-4">
                 {% if tour.main_image %}
                     <img src="{{ tour.main_image.image.url }}" alt="{{ tour.title }}" class="tour-image">
                 {% else %}
@@ -111,19 +87,16 @@
 
         <section class="mt-5">
             <h2 class="section-title">Описание тура</h2>
-            <p>{{ tour.description|default:"Описание тура отсутствует." }}</p>
+            <p>{{ tour.description|linebreaksbr }}</p>
         </section>
 
-        {% if tour.images.exists %}
-        <section class="mt-4">
+        {% if tour.images.all %}
+        <section class="mt-5">
             <h2 class="section-title">Галерея изображений</h2>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 {% for image in tour.images.all %}
                 <div class="col">
-                    <div class="card h-100">
-                        <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.caption }}" style="height: 200px; object-fit: cover;">
-                        {% if image.caption %}<div class="card-body"><p class="card-text"><small class="text-muted">{{ image.caption }}</small></p></div>{% endif %}
-                    </div>
+                    <img src="{{ image.image.url }}" class="img-fluid rounded shadow-sm" alt="{{ image.caption }}">
                 </div>
                 {% endfor %}
             </div>
@@ -131,20 +104,14 @@
         {% endif %}
 
         <section class="mt-5">
-            <h2 class="section-title">Отзывы ({{ reviews|length }})</h2>
-            {% if avg_rating %}
-                <p>Средняя оценка: <span class="fw-bold">{{ avg_rating|floatformat:1 }}</span> из 5 <span class="rating-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></p>
-            {% else %}
-                <p>Отзывов пока нет.</p>
-            {% endif %}
-
+            <h2 class="section-title">Отзывы (Средняя оценка: {{ average_rating|floatformat:1 }}/5)</h2>
             {% if reviews %}
                 <div class="row">
                     {% for review in reviews %}
                     <div class="col-md-6">
                         <div class="review-card">
-                            <p class="mb-1"><strong>{{ review.user.first_name|default:review.user.username }}</strong> &mdash; Оценка: <span class="fw-bold">{{ review.rating }}</span>/5</p>
-                            <p class="text-muted"><small>{{ review.created_at|date:"d.m.Y H:i" }}</small></p>
+                            <h5>{{ review.user.username }} <span class="rating-stars">{% for _ in 1|ljust:review.rating %}&#9733;{% endfor %}</span></h5>
+                            <p class="text-muted"><small>Оставлен: {{ review.created_at|date:"d.m.Y H:i" }}</small></p>
                             <p>{{ review.text }}</p>
                         </div>
                     </div>

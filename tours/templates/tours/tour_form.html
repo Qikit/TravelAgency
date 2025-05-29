@@ -1,9 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ form_title }}</title>
+    <title>{{ page_title }} - Туристическое агентство</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -18,37 +19,37 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'home' %}">Главная</a>
                     </li>
-                    {% if tour %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tour_detail' tour.pk %}">К туру "{{ tour.title }}"</a>
+                        <a class="nav-link" href="#">О нас</a>
                     </li>
-                    {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link btn btn-sm btn-outline-primary ms-2" href="{% url 'tour_add' %}">Добавить тур</a>
+                        <a class="nav-link" href="#">Контакты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Личный кабинет</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container my-5">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    <div class="container mt-5">
+        <h1 class="mb-4">{{ page_title }}</h1>
 
-        <h1>{{ form_title }}</h1>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% for field in form %}
                 <div class="mb-3">
-                    {{ field.label_tag }}
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                     {{ field }}
                     {% if field.help_text %}
                         <div class="form-text">{{ field.help_text }}</div>
@@ -57,58 +58,21 @@
                         <div class="text-danger">{{ error }}</div>
                     {% endfor %}
                 </div>
+                {% if field.name == 'description' %}
+                    {% if form.instance.main_image and form.instance.main_image.image %}
+                        <div class="mb-3">
+                            <label class="form-label">Текущее главное изображение:</label><br>
+                            <img src="{{ form.instance.main_image.image.url }}" alt="Текущее изображение" style="max-width: 200px; height: auto;">
+                        </div>
+                    {% endif %}
+                {% endif %}
             {% endfor %}
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <a href="{% url 'home' %}" class="btn btn-secondary ms-2">Отмена</a>
-        </form>
-    </main>
 
-    <footer class="bg-light text-center py-4 mt-5">
-        <p>&copy; 2024 TravelAgency. Все права защищены.</p>
-    </footer>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // JS для динамической подгрузки городов и отелей (пример, требует доработки)
-        // В реальном проекте лучше использовать Fetch API
-        document.addEventListener('DOMContentLoaded', function() {
-            const countrySelect = document.getElementById('id_country');
-            const citySelect = document.getElementById('id_city');
-            const hotelSelect = document.getElementById('id_hotel');
-
-            if (countrySelect && citySelect && hotelSelect) {
-                countrySelect.addEventListener('change', function() {
-                    const countryId = this.value;
-                    if (countryId) {
-                        fetch(`/api/cities/?country_id=${countryId}`) // Это потребует отдельного API endpoint
-                            .then(response => response.json())
-                            .then(cities => {
-                                citySelect.innerHTML = '<option value="">Выберите город</option>';
-                                cities.forEach(city => {
-                                    const option = document.createElement('option');
-                                    option.value = city.id;
-                                    option.textContent = city.name;
-                                    citySelect.appendChild(option);
-                                });
-                            });
-                        fetch(`/api/hotels/?country_id=${countryId}`) // Это потребует отдельного API endpoint
-                            .then(response => response.json())
-                            .then(hotels => {
-                                hotelSelect.innerHTML = '<option value="">Выберите отель</option>';
-                                hotels.forEach(hotel => {
-                                    const option = document.createElement('option');
-                                    option.value = hotel.id;
-                                    option.textContent = hotel.name;
-                                    hotelSelect.appendChild(option);
-                                });
-                            });
-                    } else {
-                        citySelect.innerHTML = '<option value="">Выберите город</option>';
-                        hotelSelect.innerHTML = '<option value="">Выберите отель</option>';
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
